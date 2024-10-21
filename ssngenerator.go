@@ -3,78 +3,90 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math"
-	"os"
+	"math/rand/v2"
 	"time"
 
 	"github.com/markysand/ssn"
+	"github.com/rickb777/date"
 )
 
-const hoursPerYear = 24 * 365.25
+func getBirthDateRange(years, months int, now time.Time) (from, to date.Date) {
+	switch {
+	case years == -1 && months == -1:
+		to = date.NewAt(now)
+		from = to.AddDate(-100, 0, 0)
+	default:
+		var (
+			intervalYears  = 0
+			intervalMonths = 1
+			y              = years
+			m              = months
+		)
+
+		if years == -1 {
+			y = 0
+		}
+
+		if months == -1 {
+			m = 0
+			intervalMonths = 0
+			intervalYears = 1
+		}
+
+		to = date.NewAt(now).AddDate(-y, -m, 0)
+		from = to.AddDate(-intervalYears, -intervalMonths, 0)
+	}
+
+	return from, to
+}
+
+func getRandomBirthDate(from, to date.Date) date.Date {
+	diff := to.Sub(from)
+
+	return from.Add(date.PeriodOfDays(rand.IntN(int(diff))) + 1)
+}
 
 func main() {
-	flagSafe := flag.Bool("safe", false, "Safe flag will restrict to safe 980C-999C three last digits SSN")
-	flagMin := flag.Float64("min", 0, "Sets min age boundary")
-	flagMax := flag.Float64("max", 100, "Sets max age boundary")
-	flagCheck := flag.Bool("check", false, "Will check an SSN, and return correct checksum if needed")
+	// parse command line arguments
+	flagYears := flag.Int("years", -1, "Set year")
+	flagMonths := flag.Int("months", -1, "Set months")
 	flagMale := flag.Bool("male", false, "Generate male only")
 	flagFemale := flag.Bool("female", false, "Generate female only")
-	flagNo := flag.Int("n", 1, "Select number of SSNs to generate")
+	flagN := flag.Int("n", 1, "Number of ssn-s to generate")
 	flag.Usage = func() {
-		fmt.Println("SSN-Generator is a tool for swedish social security numbers - SSN-s. SSN-s that end with 98xx or 99xx are not used by real living persons and are considered safe for testing. -check and -safe can be combined - will also return the SSN provided as a safe variant")
+		fmt.Printf(`SSN-Generator is a tool for generating random, safe Swedish SSNs (Social Security Numbers) for testing purposes.
+
+- If you specify months, the generated birth date will have month-level precision.
+- If months are not specified, the birth date will have year-level precision.
+- If neither years nor months are provided, the generated age will range between 0 and 100 years.
+
+`)
 		flag.CommandLine.PrintDefaults()
 	}
 	flag.Parse()
-	args := flag.Args()
-	l := len(args)
-	switch {
-	case *flagCheck && l >= 1:
-		input := args[0]
-		n, err := ssn.NewSSNFromString(input)
-		switch err {
-		case nil:
-			fmt.Printf("%v is a valid SSN\n", n)
-			fmt.Printf("Age: %v, Gender: %v\n",
-				math.Round(n.Age(time.Now()).Hours()/hoursPerYear*100)/100,
-				func() string {
-					if n.Female() {
-						return "FEMALE"
-					}
-					return "MALE"
-				}(),
-			)
-			if *flagSafe {
-				n.SetLastDigits("ss*c")
-				fmt.Printf("As a safe ssn, it should be %v\n", n)
-			}
-		case ssn.ErrChecksum:
-			n.SetLastDigits("***c")
-			fmt.Printf("%v has incorrect checksum - it should be: %v\n", input, n)
-		default:
-			fmt.Printf("%v has invalid format - %v\n", input, err.Error())
-		}
-	case l >= 1:
-		fmt.Println("Not sure what you want me to do... maybe you want me to check an ssn - in that case use the 'check' flag")
-		flag.PrintDefaults()
-	default:
-		last := []byte("???c")
-		if *flagSafe {
-			last[0], last[1] = byte('s'), byte('s')
-		}
-		if *flagMale {
-			last[2] = byte('m')
-		} else if *flagFemale {
-			last[2] = byte('f')
-		}
-		max := time.Duration(*flagMax*hoursPerYear) * time.Hour
-		min := time.Duration(*flagMin*hoursPerYear) * time.Hour
-		separator := NewCutter(1, 5, os.Stdout)
-		for i := 0; i < *flagNo; i++ {
-			var n ssn.SSN
-			n.SetDate(ssn.GetRandomTime(max, min))
-			n.SetLastDigits(string(last))
-			fmt.Print(n)
-			separator.Next()
-		}
+
+	// common ssn setup
+	lastDigitsArg := []byte("ss?c")
+
+	if *flagFemale {
+		lastDigitsArg[2] = 'f'
+	}
+	if *flagMale {
+		lastDigitsArg[2] = 'm'
+	}
+
+	from, to := getBirthDateRange(*flagYears, *flagMonths, time.Now())
+
+	// generate ssn-s
+	for range *flagN {
+		var s ssn.SSN
+
+		birthDate := getRandomBirthDate(from, to)
+
+		s.SetDate(birthDate.In(time.Local))
+
+		s.SetLastDigits(string(lastDigitsArg))
+
+		fmt.Println(s.Format(true, true))
 	}
 }
