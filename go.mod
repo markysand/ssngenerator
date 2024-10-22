@@ -1,4 +1,4 @@
-module github.com/markysand/ssngenerator
+module github.com/markysand/ssngenerator/v2
 
 go 1.23.0
 
