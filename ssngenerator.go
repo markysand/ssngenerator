@@ -21,18 +21,6 @@ func getRandomBirthDate(from, to date.Date) date.Date {
 	return from.Add(date.PeriodOfDays(rand.IntN(int(diff))) + 1)
 }
 
-// norwegian ssn checksum
-func checksum(ssn string) int {
-	weights := []int{3, 7, 6, 1, 8, 9, 4, 5, 2}
-	sum := 0
-
-	for i, r := range ssn[:len(ssn)-1] {
-		sum += int(r-'0') * weights[i]
-	}
-
-	return (11 - sum%11) % 11
-}
-
 func lastDigits(c *config) string {
 	lastDigitsArg := []byte("ss?c")
 

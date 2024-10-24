@@ -38,7 +38,7 @@ func getBirthRange(c *config) (from, to date.Date) {
 		to = now
 		from = to.AddDate(-teenAge, 0, 0)
 
-	case c.child:
+	case c.teen:
 		to = now.AddDate(-teenAge, 0, 0)
 		from = now.AddDate(-adultAge, 0, 0)
 
