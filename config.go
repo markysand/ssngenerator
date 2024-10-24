@@ -3,11 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/rickb777/date"
 )
 
 type config struct {
 	years, months, n                 int
 	child, teen, adult, male, female bool
+	now                              date.Date
 }
 
 func parseConfig() *config {

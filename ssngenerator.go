@@ -27,6 +27,7 @@ func lastDigits(c *config) string {
 	if c.female {
 		lastDigitsArg[2] = 'f'
 	}
+
 	if c.male {
 		lastDigitsArg[2] = 'm'
 	}

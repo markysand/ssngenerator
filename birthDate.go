@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/rickb777/date"
 )
 
@@ -31,27 +29,25 @@ func getBirthRangeFromRange(now date.Date, years, months int) (from, to date.Dat
 }
 
 func getBirthRange(c *config) (from, to date.Date) {
-	now := date.NewAt(time.Now())
-
 	switch {
 	case c.child:
-		to = now
+		to = c.now
 		from = to.AddDate(-teenAge, 0, 0)
 
 	case c.teen:
-		to = now.AddDate(-teenAge, 0, 0)
-		from = now.AddDate(-adultAge, 0, 0)
+		to = c.now.AddDate(-teenAge, 0, 0)
+		from = c.now.AddDate(-adultAge, 0, 0)
 
 	case c.adult:
-		to = now.AddDate(-adultAge, 0, 0)
-		from = now.AddDate(-maxAge, 0, 0)
+		to = c.now.AddDate(-adultAge, 0, 0)
+		from = c.now.AddDate(-maxAge, 0, 0)
 
 	case c.years == -1 && c.months == -1:
-		to = now
+		to = c.now
 		from = to.AddDate(-maxAge, 0, 0)
 
 	default:
-		from, to = getBirthRangeFromRange(now, c.years, c.months)
+		from, to = getBirthRangeFromRange(c.now, c.years, c.months)
 	}
 
 	return from, to
