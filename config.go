@@ -39,5 +39,7 @@ func parseConfig() *config {
 
 	flag.Parse()
 
+	c.now = date.Today()
+
 	return c
 }
