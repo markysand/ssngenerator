@@ -1,15 +1,18 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 
+	"github.com/markysand/ssngenerator/v2/ssn"
 	"github.com/rickb777/date"
 )
 
 type config struct {
 	years, months, n                 int
 	child, teen, adult, male, female bool
+	format                           ssn.Format
 	now                              date.Date
 }
 
@@ -24,6 +27,19 @@ func parseConfig() *config {
 	flag.BoolVar(&c.adult, "adult", false, "Adult, 18-100 years")
 	flag.BoolVar(&c.male, "male", false, "Generate male only")
 	flag.BoolVar(&c.female, "female", false, "Generate female only")
+	flag.Func("format", "Format (database, display, legacy)", func(s string) error {
+		switch s {
+		case "database", "":
+			c.format = ssn.FormatDatabase
+		case "display":
+			c.format = ssn.FormatDisplay
+		case "legacy":
+			c.format = ssn.FormatLegacy
+		default:
+			return errors.New("invalid format")
+		}
+		return nil
+	})
 
 	flag.Usage = func() {
 		fmt.Printf(`SSN-Generator is a tool for generating random, safe Swedish SSNs (Social Security Numbers) for testing purposes.

@@ -36,6 +36,6 @@ func main() {
 
 		s := ssn.New(birthDate, gender)
 
-		fmt.Println(s.Format())
+		fmt.Println(s.Format(c.format))
 	}
 }

@@ -7,10 +7,8 @@ import (
 	"github.com/rickb777/date"
 )
 
-type index int
-
 const (
-	indexYear1 index = iota
+	indexYear1 int = iota
 	indexYear2
 	indexYear3
 	indexYear4
@@ -26,7 +24,7 @@ const (
 
 type SSN [12]int
 
-const zero = '0'
+const zeroChar = '0'
 
 func doubled(n int) int {
 	value := n * 2
@@ -57,14 +55,57 @@ func (n *SSN) SetChecksum() {
 	(*n)[indexCheckSum] = n.GetCheckSum()
 }
 
-func (n *SSN) Format() string {
+type Format int
+
+const (
+	// Century digits and no separator
+	FormatDatabase = iota
+	// Century digits and separator, but no + since it is redundant
+	FormatDisplay
+	// No century digits, original separator that turns to + the year the person will be 100 years old
+	FormatLegacy
+)
+
+func (f Format) ShowCentury() bool {
+	switch f {
+	case FormatDatabase, FormatDisplay:
+		return true
+	default:
+		return false
+	}
+}
+
+func (f Format) ShowDash() bool {
+	switch f {
+	case FormatDisplay, FormatLegacy:
+		return true
+	default:
+		return false
+	}
+}
+
+func (n *SSN) Year() int {
+	return n[indexYear1]*1000 + n[indexYear2]*100 + n[indexYear3]*10 + n[indexYear4]
+}
+
+func (n *SSN) Format(f Format) string {
 	var b strings.Builder
 
 	for index, v := range n {
-		b.WriteByte(byte(v + zero))
+		if !f.ShowCentury() && (index == indexYear1 || index == indexYear2) {
+			continue
+		}
 
-		if index == 7 {
-			b.WriteByte('-')
+		b.WriteByte(byte(v + zeroChar))
+
+		if index == 7 && f.ShowDash() {
+			// Use `+` for 100 year olds when century digits are missing
+			if f == FormatLegacy && date.Today().Year()-n.Year() >= 100 {
+				b.WriteByte('+')
+			} else {
+				b.WriteByte('-')
+			}
+
 		}
 	}
 
