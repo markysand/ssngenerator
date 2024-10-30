@@ -49,6 +49,11 @@ func parseConfig() *config {
 - If neither years nor months are provided, the generated age will range between 0 and 100 years.
 - Child, teen, adult will generate ages in the ranges of 0-12, 13-17, 18-100 years respectively.
 
+There are 3 formats
+- database: Default. Century digits, no dash.
+- display: mModern display format used in passports etc. Century digits with dash.
+- legacy: Legacy display format without century digits. Plus is used over dash to indicate age >= 100. Actually plus is used from the year the person turns 100.
+
 `)
 		flag.CommandLine.PrintDefaults()
 	}
