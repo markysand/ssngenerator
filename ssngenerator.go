@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
-	"time"
 
-	"github.com/markysand/ssn"
+	"github.com/markysand/ssngenerator/v2/ssn"
 	"github.com/rickb777/date"
 )
 
@@ -21,30 +20,22 @@ func getRandomBirthDate(from, to date.Date) date.Date {
 	return from.Add(date.PeriodOfDays(rand.IntN(int(diff))) + 1)
 }
 
-func lastDigits(c *config) string {
-	lastDigitsArg := []byte("ss?c")
-
-	if c.female {
-		lastDigitsArg[2] = 'f'
-	}
-
-	if c.male {
-		lastDigitsArg[2] = 'm'
-	}
-
-	return string(lastDigitsArg)
-}
-
 func main() {
 	c := parseConfig()
+
+	var gender ssn.Gender
+
+	if c.male {
+		gender = ssn.GenderMale
+	} else if c.female {
+		gender = ssn.GenderFemale
+	}
 
 	for range c.n {
 		birthDate := getRandomBirthDate(getBirthRange(c))
 
-		var s ssn.SSN
-		s.SetDate(birthDate.In(time.Local))
-		s.SetLastDigits(string(lastDigits(c)))
+		s := ssn.New(birthDate, gender)
 
-		fmt.Println(s.Format(true, true))
+		fmt.Println(s.Format())
 	}
 }
