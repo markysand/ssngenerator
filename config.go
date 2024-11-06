@@ -52,7 +52,7 @@ func parseConfig() *config {
 There are 3 formats:
 - display: Default. Modern display format used in passports etc. Century digits with dash.
 - database: Century digits, no dash.
-- legacy: Legacy display format without century digits. Plus is used over dash to indicate age >= 100. Actually plus is used from the year the person turns 100.
+- legacy: Legacy display format without century digits. Plus is used over dash from the year the person turns 100 years old.
 
 `)
 		flag.CommandLine.PrintDefaults()
