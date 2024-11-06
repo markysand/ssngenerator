@@ -64,7 +64,5 @@ There are 3 formats:
 
 	flag.Parse()
 
-	c.now = date.Today()
-
 	return c
 }
