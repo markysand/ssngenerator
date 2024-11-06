@@ -59,7 +59,7 @@ type Format int
 
 const (
 	// Century digits and no separator
-	FormatDatabase = iota
+	FormatDatabase Format = iota
 	// Century digits and separator, but no + since it is redundant
 	FormatDisplay
 	// No century digits, original separator that turns to + the year the person will be 100 years old
@@ -128,7 +128,7 @@ func (n *SSN) SetBirthDate(year int, month int, day int) {
 type Gender int
 
 const (
-	GenderUnknown = iota
+	GenderUnknown Gender = iota
 	GenderMale
 	GenderFemale
 )

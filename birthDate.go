@@ -4,7 +4,7 @@ import (
 	"github.com/rickb777/date"
 )
 
-func getBirthRangeFromRange(now date.Date, years, months int) (from, to date.Date) {
+func getBirthRangeFromYearsAndMonths(now date.Date, years, months int) (from, to date.Date) {
 	var (
 		intervalYears      = 0
 		intervalMonths     = 1
@@ -47,7 +47,7 @@ func getBirthRange(c *config) (from, to date.Date) {
 		from = to.AddDate(-maxAge, 0, 0)
 
 	default:
-		from, to = getBirthRangeFromRange(c.now, c.years, c.months)
+		from, to = getBirthRangeFromYearsAndMonths(c.now, c.years, c.months)
 	}
 
 	return from, to
