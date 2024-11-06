@@ -17,7 +17,11 @@ type config struct {
 }
 
 func parseConfig() *config {
-	c := new(config)
+	c := &config{
+		// defaults
+		format: ssn.FormatDisplay,
+		now:    date.Today(),
+	}
 
 	flag.IntVar(&c.years, "years", -1, "Set year")
 	flag.IntVar(&c.months, "months", -1, "Set months")
